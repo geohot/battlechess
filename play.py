@@ -2,6 +2,7 @@
 import asyncio
 import chess
 import chess.engine
+import requests
 
 # battle two github users
 async def battle(user1, user2):
@@ -30,8 +31,15 @@ async def battle(user1, user2):
   print(board)
 
 async def main():
-  # TODO: Fetch forks of battlechess from github API
-  await battle("geohot", "geohot")
+  forks = ["geohot"]
+  r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
+  for arr in r.json():
+    forks.append(arr['full_name'].split("/")[0])
+  print("battling", forks)
+  for u1 in forks:
+    for u2 in forks:
+      if u1 != u2:
+        await battle(u1, u2)
 
 if __name__ == "__main__":
   asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
