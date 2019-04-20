@@ -33,8 +33,7 @@ async def battle(user1, user2):
 async def main():
   forks = ["geohot"]
   r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
-  for arr in r.json():
-    forks.append(arr['full_name'].split("/")[0])
+  forks += [arr['full_name'].replace("/battlechess", "") for arr in r.json()]
   print("battling", forks)
   for u1 in forks:
     for u2 in forks:
