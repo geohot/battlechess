@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
+import time
 import chess
 import chess.engine
 import requests
@@ -53,10 +54,15 @@ async def battle(user1, user2):
 
 async def main():
   forks = ["geohot"]
-  r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
-  print("fetch forks: %d" % r.status_code)
-  if r.status_code != 200:
-    print(r.text)
+  for i in range(1, 11):
+    r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
+    print("fetch forks: %d" % r.status_code)
+    if r.status_code != 200:
+      print(r.text)
+    else:
+      break
+    time.sleep(i)
+  else:
     raise Exception("fetch forks failed")
   dat = r.json()
   # filter stupid forks that didn't change anything
