@@ -12,8 +12,8 @@ resultToScore = {"0": -1000, "1": 1000, "1/2": 0}
 
 def evaluate(board):
     if board.is_game_over():
-        result = list(map(float, board.result().split("-")))
-        my_result = result[int(board.turn)]
+        result = board.result().split("-")
+        my_result = result[int(not board.turn)]
         return resultToScore[my_result]
     else:
         score = 0
