@@ -6,7 +6,7 @@ import chess
 from itertools import repeat, starmap
 import multiprocessing.dummy
 
-pool = multiprocessing.dummy.Pool(15)  # todo: smarter way to get # of threads
+# pool = multiprocessing.dummy.Pool(15)  # todo: smarter way to get # of threads
 resultToScore = {"0": -1000, "1": 1000, "1/2": 0}
 
 
@@ -58,12 +58,12 @@ def get_move(board, limit=None):
     move_scores = None
     args = zip(repeat(board), board.legal_moves)
 
-    move_scores = pool.starmap(evaluate_move, args)
+    move_scores = starmap(evaluate_move, args)
     move_scores = [x for x in move_scores]
     random.shuffle(move_scores)  # make things more interesting
     # find move with max score
     (best_move, best_score) = max(move_scores, key=lambda i: i[1])
-    # print(best_score)
+    print(best_score)
 
     return best_move
 
