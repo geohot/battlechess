@@ -25,6 +25,7 @@ async def battle(user1, user2):
   transport, engine2 = await chess.engine.popen_uci(engine2_path)
 
   board = chess.Board()
+  outcome = None
   while not board.is_game_over():
     #print("***** move %d turn %d *****" % (board.fullmove_number, board.turn))
     #print(board)
@@ -33,20 +34,22 @@ async def battle(user1, user2):
       result = await play_handler(engine1, board)
       if result is None:
         print("%s(white) forfeits" % user1)
-        return "0-1"
+        outcome = "0-1"
+        break
     else:
       # black
       result = await play_handler(engine2, board)
       if result is None:
         print("%s(black) forfeits" % user2)
-        return "1-0"
+        outcome = "1-0"
+        break
     board.push(result.move)
 
   await engine1.quit()
   await engine2.quit()
 
   print(board)
-  return board.result()
+  return outcome if outcome is not None else board.result()
 
 async def main():
   forks = ["geohot"]
