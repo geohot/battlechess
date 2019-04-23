@@ -65,10 +65,10 @@ def move_optimality(board, max_depth, use_multiprocess):
     fen = board.fen()
     args = zip(repeat(fen), board.legal_moves, repeat(max_depth))
 
-    if use_multiprocess:
-        with Pool(10) as p:  # todo: use number of cpu cores
-            move_scores = p.starmap(evaluate_move, args)
-    else:
+    # if use_multiprocess:
+    #     with Pool(10) as p:  # todo: use number of cpu cores
+    #         move_scores = p.starmap(evaluate_move, args)
+    # else:
         move_scores = starmap(evaluate_move, args)
 
     move_scores = [x for x in move_scores]
