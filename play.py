@@ -55,6 +55,9 @@ async def main():
   forks = ["geohot"]
   r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
   print("fetch forks: %d" % r.status_code)
+  if r.status_code != 200:
+    print(r.text)
+    raise Exception("fetch forks failed")
   dat = r.json()
   # filter stupid forks that didn't change anything
   blacklisted_times = ["2019-04-20T00:56:04Z"]
