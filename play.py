@@ -54,9 +54,11 @@ async def battle(user1, user2):
 async def main():
   forks = ["geohot"]
   r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
+  print("fetch forks: %d" % r.status_code)
+  dat = r.json()
   # filter stupid forks that didn't change anything
   blacklisted_times = ["2019-04-20T00:56:04Z"]
-  forks += [arr['full_name'].replace("/battlechess", "") for arr in r.json() if arr['pushed_at'] not in blacklisted_times]
+  forks += [arr['full_name'].replace("/battlechess", "") for arr in dat if arr['pushed_at'] not in blacklisted_times]
   print("battling", forks)
   score = defaultdict(int)
   # TODO: not n^2 tournament, double elimination?
