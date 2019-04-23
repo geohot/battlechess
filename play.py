@@ -54,7 +54,7 @@ async def battle(user1, user2):
 
 async def main():
   forks = ["geohot"]
-  for i in range(1, 11):
+  for i in range(1, 51):
     r = requests.get("https://api.github.com/repos/geohot/battlechess/forks")
     print("fetch forks: %d" % r.status_code)
     if r.status_code != 200:

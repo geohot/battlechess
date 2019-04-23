@@ -10,6 +10,6 @@ The idea isn't to modify stockfish, it's to write clever short python algorithms
 
 UPDATE: You have at most 100ms to make your move. Go over, and you forfeit the match.
 
-UPDATE: seccomp sandbox added, do not use fork, exec, the internet, or the filesystem.
+UPDATE: seccomp sandbox will be added, do not use fork, exec, the internet, or the filesystem.
 
 
