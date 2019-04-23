@@ -3,6 +3,8 @@ import sys
 import time
 import random
 import chess
+from itertools import repeat, starmap
+from multiprocessing import Pool
 
 
 def evaluate(board):
@@ -29,39 +31,53 @@ def evaluate(board):
         return score
 
 
+def evaluate_move(fen, move, max_depth):
+    move_score = 0
+    n_moves = 0
+
+    b_my_move = chess.Board(fen)
+    b_my_move.push(move)
+
+    for their_move in b_my_move.legal_moves:
+        n_moves += 1
+        b_their_move = b_my_move.copy()
+        b_their_move.push(their_move)
+
+        if max_depth > 1 and not b_their_move.is_game_over():
+            move_score += move_optimality(b_their_move, max_depth - 1, False)[2]
+        else:
+            # negative because it's their board
+            move_score -= evaluate(b_their_move)
+
+    return (move, move_score / n_moves)
+
+
 # Returns tuple of (best_move, best_score, average_score) for all moves on board
-def move_optimality(board, max_depth):
-    best_move = None
-    best_score = -9999
-    move_scores = []
+def move_optimality(board, max_depth, use_multiprocess):
+    move_scores = None
+    fen = board.fen()
+    args = zip(repeat(fen), board.legal_moves, repeat(max_depth))
 
-    for move in board.legal_moves:
-        move_score = 0
+    if use_multiprocess:
+        with Pool(10) as p:
+            move_scores = p.starmap(evaluate_move, args)
+    else:
+        move_scores = starmap(evaluate_move, args)
 
-        b_my_move = board.copy()
-        b_my_move.push(move)
+    move_scores = [x for x in move_scores]
+    # find move with max score
+    (best_move, best_score) = max(move_scores, key=lambda i: i[1])
 
-        for their_move in b_my_move.legal_moves:
-            b_their_move = b_my_move.copy()
-            b_their_move.push(their_move)
-
-            if max_depth > 1 and not b_their_move.is_game_over():
-                move_score = move_optimality(b_their_move, max_depth - 1)[2]
-            else:
-                # negative because it's their board
-                move_score -= evaluate(b_their_move)
-
-        move_scores.append(move_score)
-        if move_score > best_score:
-            best_score = move_score
-            best_move = move
-
-    return (best_move, best_score, sum(move_scores) / len(move_scores))
+    return (
+        best_move,
+        best_score,
+        sum(map(lambda i: i[1], move_scores)) / len(move_scores),
+    )
 
 
 def get_move(board, limit=None):
-    (best_move, best_score, _) = move_optimality(board, 2)
-    # print(best_score)
+    (best_move, best_score, _) = move_optimality(board, 2, True)
+    print(best_score)
     return best_move
 
 
