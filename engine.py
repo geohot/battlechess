@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import sys
 import time
-from random import choice
+import random
 import chess
 
 
 def evaluate(board):
     if board.is_game_over():
-        result = list(map(float, board.result.split("-")))
+        result = list(map(float, board.result().split("-")))
         my_result = result[int(board.turn)]
         return (my_result - 0.5) * 2000  # maps set {0, 1/2, 1} to {-1000, 0, 1000}
     else:
@@ -29,36 +29,39 @@ def evaluate(board):
         return score
 
 
+# Returns tuple of (best_move, best_score, average_score) for all moves on board
 def move_optimality(board, max_depth):
     best_move = None
-    best_score = 0
+    best_score = -9999
     move_scores = []
 
     for move in board.legal_moves:
-        move_score = None
+        move_score = 0
 
-        test_board = board.copy()
-        test_board.push(move)
+        b_my_move = board.copy()
+        b_my_move.push(move)
 
-        for other_player_move in board.legal_moves:
-            test_board_2 = test_board.copy()
-            test_board_2.push(other_player_move)
+        for their_move in b_my_move.legal_moves:
+            b_their_move = b_my_move.copy()
+            b_their_move.push(their_move)
 
-            if max_depth > 0:
-                move_score = move_optimality(test_board_2, max_depth - 1)[2]
+            if max_depth > 1 and not b_their_move.is_game_over():
+                move_score = move_optimality(b_their_move, max_depth - 1)[2]
             else:
-                move_score = evaluate(test_board)
-            if move_score > best_score:
-                best_score = move_score
-                best_move = move
-            move_scores.append(move_score)
+                # negative because it's their board
+                move_score -= evaluate(b_their_move)
 
-        return (best_move, best_score, sum(move_scores) / len(move_scores))
+        move_scores.append(move_score)
+        if move_score > best_score:
+            best_score = move_score
+            best_move = move
+
+    return (best_move, best_score, sum(move_scores) / len(move_scores))
 
 
 def get_move(board, limit=None):
     (best_move, best_score, _) = move_optimality(board, 2)
-    print(best_score)
+    # print(best_score)
     return best_move
 
 
