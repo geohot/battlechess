@@ -57,7 +57,9 @@ def move_optimality(board, max_depth):
 
 
 def get_move(board, limit=None):
-    return move_optimality(board, 1)[0]
+    (best_move, best_score, _) = move_optimality(board, 2)
+    print(best_score)
+    return best_move
 
 
 if __name__ == "__main__":
