@@ -35,23 +35,24 @@ def evaluate_move(fen, move, max_depth):
     move_score = 0
     n_moves = 0
 
-    b_my_move = chess.Board(fen)
-    b_my_move.push(move)
+    b_our_move = chess.Board(fen)
+    b_our_move.push(move)
 
-    if b_my_move.is_game_over():
-        move_score = evaluate(b_my_move)
+    if b_our_move.is_game_over():
+        move_score -= evaluate(b_our_move)  # It's now their turn
         return (move, move_score)
     else:
-        for their_move in b_my_move.legal_moves:
+        for their_move in b_our_move.legal_moves:
             n_moves += 1
-            b_their_move = b_my_move.copy()
+            b_their_move = b_our_move.copy()
             b_their_move.push(their_move)
 
-            if max_depth > 1 and not b_their_move.is_game_over():
-                move_score += move_optimality(b_their_move, max_depth - 1, False)[2]
-            else:
-                # negative because it's their board
-                move_score -= evaluate(b_their_move)
+            move_score += evaluate(b_their_move)  # It's now our turn
+            # if max_depth > 1 and not b_their_move.is_game_over():
+            #     move_score += move_optimality(b_their_move, max_depth - 1, False)[2]
+            # else:
+            #     # negative because it's their board
+            #     move_score -= evaluate(b_their_move)
 
     return (move, move_score / n_moves)
 
@@ -63,12 +64,13 @@ def move_optimality(board, max_depth, use_multiprocess):
     args = zip(repeat(fen), board.legal_moves, repeat(max_depth))
 
     if use_multiprocess:
-        with Pool(10) as p:
+        with Pool(10) as p: # todo: use # cpu cores
             move_scores = p.starmap(evaluate_move, args)
     else:
         move_scores = starmap(evaluate_move, args)
 
-    move_scores = [x for x in move_scores]
+    # Shuffle to make things more interesting
+    move_scores = random.shuffle([x for x in move_scores])
     # find move with max score
     (best_move, best_score) = max(move_scores, key=lambda i: i[1])
 
