@@ -69,7 +69,7 @@ def move_optimality(board, max_depth, use_multiprocess):
     #     with Pool(10) as p:  # todo: use number of cpu cores
     #         move_scores = p.starmap(evaluate_move, args)
     # else:
-        move_scores = starmap(evaluate_move, args)
+    move_scores = starmap(evaluate_move, args)
 
     move_scores = [x for x in move_scores]
     random.shuffle(move_scores)  # make things more interesting
