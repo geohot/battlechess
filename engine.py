@@ -7,13 +7,15 @@ from itertools import repeat, starmap
 from multiprocessing import Pool
 
 
+resultToScore = {"0": -1000, "1": 1000, "1/2": 0}
+
+
 def evaluate(board):
     if board.is_game_over():
         result = list(map(float, board.result().split("-")))
         my_result = result[int(board.turn)]
-        return (my_result - 0.5) * 2000  # maps set {0, 1/2, 1} to {-1000, 0, 1000}
+        return resultToScore[my_result]
     else:
-        # Simple piece adding
         score = 0
 
         score += 1 * len(board.pieces(chess.PAWN, board.turn))
