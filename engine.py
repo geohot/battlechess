@@ -4,9 +4,9 @@ import time
 import random
 import chess
 from itertools import repeat, starmap
-from multiprocessing import Pool
+import multiprocessing.dummy
 
-
+pool = multiprocessing.dummy.Pool(15)  # todo: smarter way to get # of threads
 resultToScore = {"0": -1000, "1": 1000, "1/2": 0}
 
 
@@ -65,12 +65,7 @@ def move_optimality(board, max_depth, use_multiprocess):
     fen = board.fen()
     args = zip(repeat(fen), board.legal_moves, repeat(max_depth))
 
-    # if use_multiprocess:
-    #     with Pool(10) as p:  # todo: use number of cpu cores
-    #         move_scores = p.starmap(evaluate_move, args)
-    # else:
-    move_scores = starmap(evaluate_move, args)
-
+    move_scores = pool.starmap(evaluate_move, args)
     move_scores = [x for x in move_scores]
     random.shuffle(move_scores)  # make things more interesting
     # find move with max score
