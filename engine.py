@@ -12,18 +12,23 @@ playingAs = None # chess.WHITE or chess.BLACK
 
 def get_move(board, limit=None):
   # TODO: Fill this in with an actual chess engine
-  # move = random.choice(list(board.legal_moves))
 
-  playingAs = board.turn
+  try: 
+    playingAs = board.turn
 
-  before = timer()
-  move = minimaxEngine(board, 2)
-  after = timer()
-  speed = after - before
-  print("Time to generate move:", speed, file=sys.stderr )
-  # print("Total engine moves evaluated:", moveCount)
-  
-  print("playing", move, file=sys.stderr)
+    before = timer()
+    move = minimaxEngine(board, 2)
+    after = timer()
+    speed = after - before
+    print("Time to generate move:", speed, file=sys.stderr )
+    print("playing", move, file=sys.stderr)
+    return move
+
+  except:
+    print("Caught exception, use backup random move", move, file=sys.stderr)
+
+    return random.choice(list(board.legal_moves))
+
   return move
 
 def minimax(board, depth, maximizer, alpha, beta):
