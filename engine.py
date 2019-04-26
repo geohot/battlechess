@@ -17,10 +17,10 @@ def get_move(board, limit=None):
   playingAs = board.turn
 
   before = timer()
-  move = minimaxEngine(board, depth)
+  move = minimaxEngine(board, 2)
   after = timer()
   speed = after - before
-  print("Time to generate move:", speed )
+  print("Time to generate move:", speed, file=sys.stderr )
   # print("Total engine moves evaluated:", moveCount)
   
   print("playing", move, file=sys.stderr)
@@ -64,7 +64,6 @@ def minimaxEngine(board, depth):
     if boardMoveValue >= bestMove:
       bestMoveBoardValue = moveBoardValue
       bestMove = move
-    
 
   return bestMove
 
