@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import os
-os.chdir(os.path.dirname(__file__))
+if os.path.realpath(os.getcwd()) != os.path.realpath(os.path.dirname(__file__)):
+  print("please start gui from the gui directory: ./gui.py")
+  exit(-1)
 
 import sys
 import chess
