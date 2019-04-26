@@ -14,10 +14,13 @@ logging.basicConfig(level=logging.ERROR)
 
 async def open_engine(engine_path):
   try:
-    transport, engine = await chess.engine.popen_uci(engine_path, stderr=open('/dev/null'))
+    transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=open('/dev/null')), 30.0)
     return engine
+  except asyncio.TimeoutError:
+    print("engine startup took longer than 30s")
   except Exception:
-    return None
+    traceback.print_exc()
+  return None
 
 async def play_handler(engine, board):
   try:
@@ -25,7 +28,7 @@ async def play_handler(engine, board):
     result = await asyncio.wait_for(engine.play(board, chess.engine.Limit(time=0.01)), 0.1)
     return result
   except asyncio.TimeoutError:
-    print("engine took longer than 100ms")
+    print("engine move took longer than 100ms")
   except chess.engine.EngineTerminatedError:
     print("engine process died unexpectedly")
   except Exception:
@@ -35,11 +38,8 @@ async def play_handler(engine, board):
 # battle two github users
 async def battle(user1, user2):
   print("battle %s %s" % (user1, user2))
-  engine1_path = ["./launch.sh", user1]
-  engine2_path = ["./launch.sh", user2]
-
-  engine1 = await open_engine(engine1_path)
-  engine2 = await open_engine(engine2_path)
+  engine1 = await open_engine(["./launch.sh", user1])
+  engine2 = await open_engine(["./launch.sh", user2])
 
   # check if engines didn't boot
   outcome = None
