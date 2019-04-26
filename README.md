@@ -8,7 +8,7 @@ Currently, the engine makes random moves. Fork this, modify get_move in engine.p
 
 The idea isn't to modify stockfish, it's to write clever short python algorithms. Will add checks for running time and code shortness soon. And if there's cheating, I'll add a sandbox. If you want to use a Python library, send a pull request to modify requirements.txt and we can discuss if it's fair.
 
-Use human.py to play your engine
+Use human.py to play your engine. Use gui/gui.py to play your engine nicely.
 
 UPDATE: You have at most 100ms to make your move. Go over, and you forfeit the match.
 
