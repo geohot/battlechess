@@ -24,6 +24,8 @@ async def open_engine(engine_path):
     else:
       transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=subprocess.DEVNULL), 30.0)
     return engine
+  except chess.engine.EngineTerminatedError:
+    print("engine startup failed")
   except asyncio.TimeoutError:
     print("engine startup took longer than 30s")
   except Exception:
