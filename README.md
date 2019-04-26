@@ -12,5 +12,5 @@ Use human.py to play your engine
 
 UPDATE: You have at most 100ms to make your move. Go over, and you forfeit the match.
 
-UPDATE: seccomp sandbox will be added, do not use fork, exec, the internet, or the filesystem.
+UPDATE: seccomp sandbox will be added, do not use exec, the internet, or the filesystem.
 

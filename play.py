@@ -5,6 +5,7 @@ import chess
 import chess.engine
 import requests
 import traceback
+from datetime import datetime
 from collections import defaultdict
 
 async def play_handler(engine, board):
@@ -66,8 +67,11 @@ async def main():
     raise Exception("fetch forks failed")
   dat = r.json()
   # filter stupid forks that didn't change anything
-  blacklisted_times = ["2019-04-20T00:56:04Z"]
-  forks += [arr['full_name'].replace("/battlechess", "") for arr in dat if arr['pushed_at'] not in blacklisted_times]
+  def format_time(x):
+    return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
+  earliest_time = format_time("2019-04-26T00:00:00Z")
+  forks += [arr['full_name'].replace("/battlechess", "") for arr in dat \
+    if format_time(arr['pushed_at']) > earliest_time]
   print("battling", forks)
   score = defaultdict(int)
   # TODO: not n^2 tournament, double elimination?
