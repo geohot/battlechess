@@ -30,11 +30,31 @@ def evaluate(board):
     return score
 
 
+def check_pawn_needs_to_be_kicked(board, move):
+    # sorry python-chess for messing with you
+    if chess.Piece.symbol(board.piece_at(move.from_square)) == 'p':
+        print("found a pawn", move, file=sys.stderr)
+        if board.turn == chess.WHITE:
+            print("white pawn at", move.uci()[1])
+            if move.uci()[1] == '2':
+                print("white pawn needs to be kicked", move, file=sys.stderr)
+                return True
+        else:
+            print("black pawn at", move.uci()[1])
+            if move.uci()[1] == '7':
+                print("black pawn needs to be kicked", move, file=sys.stderr)
+                return True
+
+    return False
+
+
 def get_move(board, limit=None):
     start = timer()
     best_move = None
     best_board_value = -sys.maxsize
     for move in board.legal_moves:
+        if check_pawn_needs_to_be_kicked(board, move):
+            return move
         board.push(move)
         board_value = evaluate(board)
         board.pop()
@@ -51,7 +71,7 @@ if __name__ == "__main__":
     print("welcome to the greatest chess engine", file=sys.stderr)
     while 1:
         cmd = input().split(" ")
-        #print(cmd, file=sys.stderr)
+        # print(cmd, file=sys.stderr)
 
         if cmd[0] == "uci":
             print("uciok")
