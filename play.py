@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import asyncio
 import time
 import chess
@@ -23,8 +24,8 @@ async def battle(user1, user2):
   engine1_path = ["./launch.sh", user1]
   engine2_path = ["./launch.sh", user2]
 
-  transport, engine1 = await chess.engine.popen_uci(engine1_path)
-  transport, engine2 = await chess.engine.popen_uci(engine2_path)
+  transport, engine1 = await chess.engine.popen_uci(engine1_path, stderr=open('/dev/null'))
+  transport, engine2 = await chess.engine.popen_uci(engine2_path, stderr=open('/dev/null'))
 
   board = chess.Board()
   outcome = None
@@ -73,6 +74,7 @@ async def main():
   forks += [arr['full_name'].replace("/battlechess", "") for arr in dat \
     if format_time(arr['pushed_at']) > earliest_time]
   print("battling", forks)
+
   score = defaultdict(int)
   # TODO: not n^2 tournament, double elimination?
   for u1 in forks:
@@ -96,5 +98,9 @@ async def main():
 if __name__ == "__main__":
   asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
   loop = asyncio.get_event_loop()
-  result = loop.run_until_complete(main())
+
+  if len(sys.argv) == 3:
+    loop.run_until_complete(battle(sys.argv[1], sys.argv[2]))
+  else:
+    loop.run_until_complete(main())
 
