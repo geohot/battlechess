@@ -17,17 +17,16 @@ def get_move(board, limit=None):
     playingAs = board.turn
 
     before = timer()
-    move = minimaxEngine(board, 1)
+    move = minimaxEngine(board, 2)
     after = timer()
     speed = after - before
     print("Time to generate move:", speed, file=sys.stderr )
     print("playing", move, file=sys.stderr)
-    return move
-
+    
   except:
     print("Caught exception, use backup random move", move, file=sys.stderr)
 
-    return random.choice(list(board.legal_moves))
+    move = random.choice(list(board.legal_moves))
 
   return move
 
@@ -36,13 +35,20 @@ def minimax(board, depth, maximizer, alpha, beta):
     return boardValue(board)
   
   if maximizer:
+    # print("max???", file=sys.stderr)
+
     maxMoveBoardValue = baseAlpha
     for move in board.legal_moves:
       board.push(move)
       maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, False, alpha, beta))
       board.pop()
       if beta <= alpha:
+
+        # print("Pruned in maximizer:", file=sys.stderr )
+
         return maxMoveBoardValue
+    # print("max", alpha, beta, maxMoveBoardValue, file=sys.stderr)
+
     return maxMoveBoardValue
   else:
     minMoveBoardValue = baseBeta
@@ -51,7 +57,10 @@ def minimax(board, depth, maximizer, alpha, beta):
       minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, True, alpha, beta))
       board.pop()
       if beta <= alpha:
+        # print("Pruned in minimizer:", file=sys.stderr )
+
         return minMoveBoardValue
+    # print("min", alpha, beta, minMoveBoardValue, file=sys.stderr)
     return minMoveBoardValue
 
 
