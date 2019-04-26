@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import asyncio
 import time
@@ -9,12 +10,18 @@ import traceback
 from datetime import datetime
 from collections import defaultdict
 
-import logging
-logging.basicConfig(level=logging.ERROR)
+DEBUG = os.getenv("DEBUG", None) is not None
+
+if not DEBUG:
+  import logging
+  logging.basicConfig(level=logging.ERROR)
 
 async def open_engine(engine_path):
   try:
-    transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=open('/dev/null')), 30.0)
+    if DEBUG:
+      transport, engine = await chess.engine.popen_uci(engine_path)
+    else:
+      transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=open('/dev/null')), 30.0)
     return engine
   except asyncio.TimeoutError:
     print("engine startup took longer than 30s")

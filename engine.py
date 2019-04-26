@@ -12,6 +12,7 @@ def get_move(board, limit=None):
   return move
 
 if __name__ == "__main__":
+  print("welcome to the greatest chess engine", file=sys.stderr)
   while 1:
     cmd = input().split(" ")
     #print(cmd, file=sys.stderr)
