@@ -77,7 +77,7 @@ def minimaxEngine(board, depth, color):
 
 # Chess boards are 8x8, 64 positions
 def boardValue(board, color):
-  if board.is_checkmate():
+  if board.is_game_over():
     if board.result() == "1-0" and color: # white wins
       return 1000000
     elif board.result() == "0-1" and color:
