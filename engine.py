@@ -27,16 +27,14 @@ def get_move(board, limit=None):
   return move
 
 def minimax(board, depth, maximizer, alpha, beta):
-  print("Minimax at depth", depth)
   if depth == 0:
     return boardValue(board)
-  moveCount += 1
   
   if maximizer:
     maxMoveBoardValue = baseAlpha
     for move in board.legal_moves:
       board.push(move)
-      maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, false, alpha, beta))
+      maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, False, alpha, beta))
       board.pop()
       if beta <= alpha:
         return maxMoveBoardValue
@@ -45,7 +43,7 @@ def minimax(board, depth, maximizer, alpha, beta):
     minMoveBoardValue = baseBeta
     for move in board.legal_moves:
       board.push(move)
-      minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, true, alpha, beta))
+      minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, True, alpha, beta))
       board.pop()
       if beta <= alpha:
         return minMoveBoardValue
@@ -53,15 +51,17 @@ def minimax(board, depth, maximizer, alpha, beta):
 
 
 def minimaxEngine(board, depth):
+  print(baseAlpha, file=sys.stderr)
+
   bestMoveBoardValue = baseAlpha
   bestMove = None
   availableMoves = board.legal_moves
 
   for move in availableMoves:
     board.push(move)
-    moveBoardValue = minimax(board, depth-1, false, baseAlpha, baseBeta)
+    moveBoardValue = minimax(board, depth-1, False, baseAlpha, baseBeta)
     board.pop()
-    if boardMoveValue >= bestMove:
+    if moveBoardValue >= bestMoveBoardValue:
       bestMoveBoardValue = moveBoardValue
       bestMove = move
 
@@ -78,8 +78,11 @@ def boardValue(board):
   return value
 
 def pieceValue(piece, friendly):
+  if piece == None:
+    return 0
   #Types | 1,2,3,4,5,6 | Pawn, Knight, Bishop, Rook, Queen, King
-  t = piece.type
+  t = piece.piece_type
+
   v = 0
   if t == 1:
     v = 100
