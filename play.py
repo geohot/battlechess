@@ -60,7 +60,6 @@ async def battle(user1, user2):
   elif engine2 is None:
     outcome = "1-0"
 
-  board = None
   if outcome is None:
     board = chess.Board()
     while not board.is_game_over():
@@ -86,10 +85,25 @@ async def battle(user1, user2):
     await engine1.quit()
   if engine2 is not None:
     await engine2.quit()
-  result = outcome if outcome is not None else board.result()
+
+  if outcome is None:
+    print(board)
+    if board.is_seventyfive_moves():
+      print("seventy-five move rule")
+    if board.is_insufficient_material():
+      print("insufficient material")
+    if not any(board.generate_legal_moves()):
+      if board.result() == "1/2-1/2":
+        print("stalemate")
+      else:
+        print("checkmate")
+    if board.is_fivefold_repetition():
+      print("fivefold repetition")
+    result = board.result()
+  else:
+    result = outcome
 
   # print outcome of match
-  print(board)
   print("result of %s vs %s is %s" % (user1, user2, result))
 
   return result
