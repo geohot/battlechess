@@ -8,19 +8,20 @@ from timeit import default_timer as timer
 moveCount = 0
 baseAlpha = -1000000
 baseBeta = 1000000
-playingAs = None # chess.WHITE or chess.BLACK
+playingAs = None # white == true, black == false
 
 def get_move(board, limit=None):
   # TODO: Fill this in with an actual chess engine
 
   try: 
-    playingAs = board.turn
+    color = board.turn
+    print(playingAs, file=sys.stderr)
 
     before = timer()
-    move = minimaxEngine(board, 2)
+    move = minimaxEngine(board, 2, color)
     after = timer()
     speed = after - before
-    print("Time to generate move:", speed, file=sys.stderr )
+    print("Time to generate move:", speed, file=sys.stderr)
     print("playing", move, file=sys.stderr)
     
   except:
@@ -30,17 +31,16 @@ def get_move(board, limit=None):
 
   return move
 
-def minimax(board, depth, maximizer, alpha, beta):
+def minimax(board, depth, maximizer, alpha, beta, color):
   if depth == 0:
-    return boardValue(board)
+    return boardValue(board, color)
   
   if maximizer:
-    # print("max???", file=sys.stderr)
 
     maxMoveBoardValue = baseAlpha
     for move in board.legal_moves:
       board.push(move)
-      maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, False, alpha, beta))
+      maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, False, alpha, beta, color))
       board.pop()
       if beta <= alpha:
 
@@ -54,7 +54,7 @@ def minimax(board, depth, maximizer, alpha, beta):
     minMoveBoardValue = baseBeta
     for move in board.legal_moves:
       board.push(move)
-      minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, True, alpha, beta))
+      minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, True, alpha, beta,color))
       board.pop()
       if beta <= alpha:
         # print("Pruned in minimizer:", file=sys.stderr )
@@ -64,7 +64,7 @@ def minimax(board, depth, maximizer, alpha, beta):
     return minMoveBoardValue
 
 
-def minimaxEngine(board, depth):
+def minimaxEngine(board, depth, color):
   print(baseAlpha, file=sys.stderr)
 
   bestMoveBoardValue = baseAlpha
@@ -73,7 +73,7 @@ def minimaxEngine(board, depth):
 
   for move in availableMoves:
     board.push(move)
-    moveBoardValue = minimax(board, depth-1, False, baseAlpha, baseBeta)
+    moveBoardValue = minimax(board, depth-1, False, baseAlpha, baseBeta, color)
     board.pop()
     if moveBoardValue >= bestMoveBoardValue:
       bestMoveBoardValue = moveBoardValue
@@ -83,15 +83,16 @@ def minimaxEngine(board, depth):
 
 
 # Chess boards are 8x8, 64 positions
-def boardValue(board):
+def boardValue(board, color):
   value = 0
-  color = board.turn
-  friendly = color == playingAs
   for i in range(64):
-    value = value + pieceValue(board.piece_at(i), friendly)
+    value = value + pieceValue(board.piece_at(i), color)
+
+  print(value, file=sys.stderr)
+  print(playingAs)
   return value
 
-def pieceValue(piece, friendly):
+def pieceValue(piece, color):
   if piece == None:
     return 0
   #Types | 1,2,3,4,5,6 | Pawn, Knight, Bishop, Rook, Queen, King
@@ -112,7 +113,8 @@ def pieceValue(piece, friendly):
     v = 9999
   else:
     v = 0
-  if friendly:
+
+  if piece.color == color:
     return v
   else:
     return -1 * v
