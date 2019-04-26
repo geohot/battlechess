@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import asyncio
 import time
@@ -6,15 +7,28 @@ import chess
 import chess.engine
 import requests
 import traceback
+import subprocess
 from datetime import datetime
 from collections import defaultdict
 
+DEBUG = os.getenv("DEBUG", None) is not None
+
+if not DEBUG:
+  import logging
+  logging.basicConfig(level=logging.ERROR)
+
 async def open_engine(engine_path):
   try:
-    transport, engine = await chess.engine.popen_uci(engine_path, stderr=open('/dev/null'))
+    if DEBUG:
+      transport, engine = await chess.engine.popen_uci(engine_path)
+    else:
+      transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=subprocess.DEVNULL), 30.0)
     return engine
+  except asyncio.TimeoutError:
+    print("engine startup took longer than 30s")
   except Exception:
-    return None
+    traceback.print_exc()
+  return None
 
 async def play_handler(engine, board):
   try:
@@ -22,7 +36,7 @@ async def play_handler(engine, board):
     result = await asyncio.wait_for(engine.play(board, chess.engine.Limit(time=0.01)), 0.1)
     return result
   except asyncio.TimeoutError:
-    print("engine took longer than 100ms")
+    print("engine move took longer than 100ms")
   except chess.engine.EngineTerminatedError:
     print("engine process died unexpectedly")
   except Exception:
@@ -32,11 +46,8 @@ async def play_handler(engine, board):
 # battle two github users
 async def battle(user1, user2):
   print("battle %s %s" % (user1, user2))
-  engine1_path = ["./launch.sh", user1]
-  engine2_path = ["./launch.sh", user2]
-
-  engine1 = await open_engine(engine1_path)
-  engine2 = await open_engine(engine2_path)
+  engine1 = await open_engine(["./launch.sh", user1])
+  engine2 = await open_engine(["./launch.sh", user2])
 
   # check if engines didn't boot
   outcome = None
@@ -70,9 +81,13 @@ async def battle(user1, user2):
 
   await engine1.quit()
   await engine2.quit()
+  result = outcome if outcome is not None else board.result()
 
+  # print outcome of match
   print(board)
-  return outcome if outcome is not None else board.result()
+  print("result of %s vs %s is %s" % (user1, user2, result))
+
+  return result
 
 async def main():
   forks = ["geohot"]
@@ -101,7 +116,6 @@ async def main():
     for u2 in forks:
       if u1 != u2:
         result = await battle(u1, u2)
-        print("result of %s vs %s is %s" % (u1, u2, result))
         if result == '1-0':
           score[u1] += 2
           score[u2] += 0
