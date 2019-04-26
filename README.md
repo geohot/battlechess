@@ -10,7 +10,7 @@ The idea isn't to modify stockfish, it's to write clever short python algorithms
 
 <pre>
 # Play vs your engine in a GUI
-cd gui; ./gui.py to play your engine.
+cd gui; ./gui.py
 
 # Run a tournament
 ./play.py
