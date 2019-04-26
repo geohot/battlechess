@@ -14,9 +14,13 @@ async def play_handler(engine, board):
     # 100ms max
     result = await asyncio.wait_for(engine.play(board, chess.engine.Limit(time=0.01)), 0.1)
     return result
+  except asyncio.TimeoutError:
+    print("engine took longer than 100ms")
+  except chess.engine.EngineTerminatedError:
+    print("engine process died unexpectedly")
   except Exception:
     traceback.print_exc()
-    return None
+  return None
 
 # battle two github users
 async def battle(user1, user2):
