@@ -3,13 +3,104 @@ import sys
 import time
 import random
 import chess
+from timeit import default_timer as timer
+
+moveCount = 0
+baseAlpha = -1000000
+baseBeta = 1000000
+playingAs = None # chess.WHITE or chess.BLACK
 
 def get_move(board, limit=None):
   # TODO: Fill this in with an actual chess engine
-  move = random.choice(list(board.legal_moves))
+  # move = random.choice(list(board.legal_moves))
 
-  #print("playing", move, file=sys.stderr)
+  playingAs = board.turn
+
+  before = timer()
+  move = minimaxEngine(board, depth)
+  after = timer()
+  speed = after - before
+  print("Time to generate move:", speed )
+  # print("Total engine moves evaluated:", moveCount)
+  
+  print("playing", move, file=sys.stderr)
   return move
+
+def minimax(board, depth, maximizer, alpha, beta):
+  print("Minimax at depth", depth)
+  if depth == 0:
+    return boardValue(board)
+  moveCount += 1
+  
+  if maximizer:
+    maxMoveBoardValue = baseAlpha
+    for move in board.legal_moves:
+      board.push(move)
+      maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, false, alpha, beta))
+      board.pop()
+      if beta <= alpha:
+        return maxMoveBoardValue
+    return maxMoveBoardValue
+  else:
+    minMoveBoardValue = baseBeta
+    for move in board.legal_moves:
+      board.push(move)
+      minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, true, alpha, beta))
+      board.pop()
+      if beta <= alpha:
+        return minMoveBoardValue
+    return minMoveBoardValue
+
+
+def minimaxEngine(board, depth):
+  bestMoveBoardValue = baseAlpha
+  bestMove = None
+  availableMoves = board.legal_moves
+
+  for move in availableMoves:
+    board.push(move)
+    moveBoardValue = minimax(board, depth-1, false, baseAlpha, baseBeta)
+    board.pop()
+    if (boardMoveValue >= bestMove) {
+      bestMoveBoardValue = moveBoardValue
+      bestMove = move
+    }
+
+  return bestMove
+
+
+# Chess boards are 8x8, 64 positions
+def boardValue(board):
+  value = 0
+  color = board.turn
+  friendly = color == playingAs
+  for i in range(64):
+    value = value + pieceValue(board.piece_at(i), friendly)
+  return value
+
+def pieceValue(piece, friendly):
+  #Types | 1,2,3,4,5,6 | Pawn, Knight, Bishop, Rook, Queen, King
+  t = piece.type
+  v = 0
+  if t == 1:
+    v = 100
+  elif t == 2:
+    v = 300
+  elif t == 3:
+    v = 325
+  elif t == 4:
+    v = 600
+  elif t == 5:
+    v = 1000
+  elif t == 6:
+    v = 9999
+  else:
+    v = 0
+  if friendly:
+    return v
+  else:
+    return -1 * v
+  
 
 if __name__ == "__main__":
   while 1:
