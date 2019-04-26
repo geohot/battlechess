@@ -58,6 +58,7 @@ async def battle(user1, user2):
   elif engine2 is None:
     outcome = "1-0"
 
+  board = None
   if outcome is None:
     board = chess.Board()
     while not board.is_game_over():
