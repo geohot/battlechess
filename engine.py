@@ -4,6 +4,7 @@ import time
 import random
 import chess
 from timeit import default_timer as timer
+from random import shuffle
 
 baseAlpha = -1000000
 baseBeta = 1000000
@@ -19,6 +20,7 @@ def get_move(board, limit=None):
     speed = after - before
     print("Time to generate move:", speed, file=sys.stderr)
     print("playing", move, file=sys.stderr)
+    print("Board Value after move", boardValue(board, color), file=sys.stderr)
     
   except:
     print("Caught exception, use backup random move", move, file=sys.stderr)
@@ -32,7 +34,7 @@ def minimax(board, depth, maximizer, alpha, beta, color):
     value = boardValue(board, color)
     after = timer()
     speed = after - before
-    print("Time to generate board value:", speed, file=sys.stderr)
+    # print("Time to generate board value:", speed, file=sys.stderr)
 
     return value
   
@@ -63,8 +65,11 @@ def minimaxEngine(board, depth, color):
   bestMoveBoardValue = baseAlpha
   bestMove = None
   availableMoves = board.legal_moves
-
-  for move in availableMoves:
+  
+  moves = list(availableMoves)
+  shuffle(moves, random.random)
+  print("Available move count", len(moves), file=sys.stderr)
+  for move in moves:
     board.push(move)
     moveBoardValue = minimax(board, depth-1, False, baseAlpha, baseBeta, color)
     board.pop()
