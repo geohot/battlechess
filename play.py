@@ -9,6 +9,9 @@ import traceback
 from datetime import datetime
 from collections import defaultdict
 
+import logging
+logging.basicConfig(level=logging.ERROR)
+
 async def open_engine(engine_path):
   try:
     transport, engine = await chess.engine.popen_uci(engine_path, stderr=open('/dev/null'))
