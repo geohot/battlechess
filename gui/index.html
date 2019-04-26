@@ -44,7 +44,7 @@ function onDrop(source, target, piece) {
 
   var promotion = piece.toLowerCase().charAt(1) == 'p' && parseInt(target.charAt(1)) == 8;
 
-  $.get('/move_coordinates', {'from': get_square(source), 'to': get_square(target), 'promotion': promotion}, function(r) {
+  $.post('/move_coordinates', {'from': get_square(source), 'to': get_square(target), 'promotion': promotion}, function(r) {
     if (r.includes("game over")) {
       document.querySelector('p').innerText = 'game over';
     } else {
@@ -55,14 +55,14 @@ function onDrop(source, target, piece) {
 }
 
 function newGame() {
-  $.get('/newgame', function(r) {
+  $.post('/newgame', function(r) {
     document.querySelector('p').innerText = '';
     board.position(r);
   });
 }
 
 function computerMove() {
-  $.get('/computermove', function(r) {
+  $.post('/computermove', function(r) {
     document.querySelector('p').innerText = '';
     board.position(r);
   });
