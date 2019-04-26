@@ -47,7 +47,7 @@ async def play_handler(engine, board):
 
 # battle two github users
 async def battle(user1, user2):
-  print("battle %s %s" % (user1, user2))
+  print("\n************* battle %s %s *************" % (user1, user2))
   engine1 = await open_engine(["./launch.sh", user1])
   engine2 = await open_engine(["./launch.sh", user2])
 
