@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+import sys
 import asyncio
 import time
 import chess
 import chess.engine
 import requests
 import traceback
+from datetime import datetime
 from collections import defaultdict
 
 async def play_handler(engine, board):
@@ -12,9 +14,13 @@ async def play_handler(engine, board):
     # 100ms max
     result = await asyncio.wait_for(engine.play(board, chess.engine.Limit(time=0.01)), 0.1)
     return result
+  except asyncio.TimeoutError:
+    print("engine took longer than 100ms")
+  except chess.engine.EngineTerminatedError:
+    print("engine process died unexpectedly")
   except Exception:
     traceback.print_exc()
-    return None
+  return None
 
 # battle two github users
 async def battle(user1, user2):
@@ -22,8 +28,8 @@ async def battle(user1, user2):
   engine1_path = ["./launch.sh", user1]
   engine2_path = ["./launch.sh", user2]
 
-  transport, engine1 = await chess.engine.popen_uci(engine1_path)
-  transport, engine2 = await chess.engine.popen_uci(engine2_path)
+  transport, engine1 = await chess.engine.popen_uci(engine1_path, stderr=open('/dev/null'))
+  transport, engine2 = await chess.engine.popen_uci(engine2_path, stderr=open('/dev/null'))
 
   board = chess.Board()
   outcome = None
@@ -66,9 +72,13 @@ async def main():
     raise Exception("fetch forks failed")
   dat = r.json()
   # filter stupid forks that didn't change anything
-  blacklisted_times = ["2019-04-20T00:56:04Z"]
-  forks += [arr['full_name'].replace("/battlechess", "") for arr in dat if arr['pushed_at'] not in blacklisted_times]
+  def format_time(x):
+    return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
+  earliest_time = format_time("2019-04-26T00:00:00Z")
+  forks += [arr['full_name'].replace("/battlechess", "") for arr in dat \
+    if format_time(arr['pushed_at']) > earliest_time]
   print("battling", forks)
+
   score = defaultdict(int)
   # TODO: not n^2 tournament, double elimination?
   for u1 in forks:
@@ -92,5 +102,9 @@ async def main():
 if __name__ == "__main__":
   asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
   loop = asyncio.get_event_loop()
-  result = loop.run_until_complete(main())
+
+  if len(sys.argv) == 3:
+    loop.run_until_complete(battle(sys.argv[1], sys.argv[2]))
+  else:
+    loop.run_until_complete(main())
 
