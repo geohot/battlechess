@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import os
+os.chdir(os.path.dirname(__file__))
+
 import sys
 import chess
 import traceback
@@ -44,5 +47,5 @@ def computermove():
   return board.fen()
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run()
 
