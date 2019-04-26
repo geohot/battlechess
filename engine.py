@@ -5,18 +5,14 @@ import random
 import chess
 from timeit import default_timer as timer
 
-moveCount = 0
 baseAlpha = -1000000
 baseBeta = 1000000
-playingAs = None # white == true, black == false
 
 def get_move(board, limit=None):
   # TODO: Fill this in with an actual chess engine
 
   try: 
     color = board.turn
-    print(playingAs, file=sys.stderr)
-
     before = timer()
     move = minimaxEngine(board, 2, color)
     after = timer()
@@ -26,7 +22,6 @@ def get_move(board, limit=None):
     
   except:
     print("Caught exception, use backup random move", move, file=sys.stderr)
-
     move = random.choice(list(board.legal_moves))
 
   return move
@@ -36,15 +31,15 @@ def minimax(board, depth, maximizer, alpha, beta, color):
     return boardValue(board, color)
   
   if maximizer:
-
     maxMoveBoardValue = baseAlpha
     for move in board.legal_moves:
       board.push(move)
       maxMoveBoardValue = max(maxMoveBoardValue, minimax(board, depth - 1, False, alpha, beta, color))
       board.pop()
+      alpha = max(alpha, maxMoveBoardValue)
       if beta <= alpha:
 
-        # print("Pruned in maximizer:", file=sys.stderr )
+        print("Pruned in maximizer:", file=sys.stderr )
 
         return maxMoveBoardValue
     # print("max", alpha, beta, maxMoveBoardValue, file=sys.stderr)
@@ -56,8 +51,9 @@ def minimax(board, depth, maximizer, alpha, beta, color):
       board.push(move)
       minMoveBoardValue = min(minMoveBoardValue, minimax(board, depth - 1, True, alpha, beta,color))
       board.pop()
+      beta = min(beta, minMoveBoardValue)
       if beta <= alpha:
-        # print("Pruned in minimizer:", file=sys.stderr )
+        print("Pruned in minimizer:", file=sys.stderr )
 
         return minMoveBoardValue
     # print("min", alpha, beta, minMoveBoardValue, file=sys.stderr)
@@ -65,8 +61,6 @@ def minimax(board, depth, maximizer, alpha, beta, color):
 
 
 def minimaxEngine(board, depth, color):
-  print(baseAlpha, file=sys.stderr)
-
   bestMoveBoardValue = baseAlpha
   bestMove = None
   availableMoves = board.legal_moves
@@ -87,9 +81,7 @@ def boardValue(board, color):
   value = 0
   for i in range(64):
     value = value + pieceValue(board.piece_at(i), color)
-
-  print(value, file=sys.stderr)
-  print(playingAs)
+  # print(value, file=sys.stderr)
   return value
 
 def pieceValue(piece, color):
