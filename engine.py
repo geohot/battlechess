@@ -14,7 +14,7 @@ def get_move(board, limit=None):
   try: 
     color = board.turn
     before = timer()
-    move = minimaxEngine(board, 2, color)
+    move = minimaxEngine(board, 1, color)
     after = timer()
     speed = after - before
     print("Time to generate move:", speed, file=sys.stderr)
@@ -28,7 +28,14 @@ def get_move(board, limit=None):
 
 def minimax(board, depth, maximizer, alpha, beta, color):
   if depth == 0:
-    return boardValue(board, color)
+    before = timer()
+    value = boardValue(board, color)
+    after = timer()
+    speed = after - before
+    print("Time to generate board value:", speed, file=sys.stderr)
+
+
+    return value
   
   if maximizer:
     maxMoveBoardValue = baseAlpha
@@ -78,6 +85,7 @@ def minimaxEngine(board, depth, color):
 
 # Chess boards are 8x8, 64 positions
 def boardValue(board, color):
+
   value = 0
   for i in range(64):
     value = value + pieceValue(board.piece_at(i), color)
