@@ -73,9 +73,13 @@ async def battle(user1, user2):
 
   await engine1.quit()
   await engine2.quit()
+  result = outcome if outcome is not None else board.result()
 
+  # print outcome of match
   print(board)
-  return outcome if outcome is not None else board.result()
+  print("result of %s vs %s is %s" % (user1, user2, result))
+
+  return result
 
 async def main():
   forks = ["geohot"]
@@ -104,7 +108,6 @@ async def main():
     for u2 in forks:
       if u1 != u2:
         result = await battle(u1, u2)
-        print("result of %s vs %s is %s" % (u1, u2, result))
         if result == '1-0':
           score[u1] += 2
           score[u2] += 0
