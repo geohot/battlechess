@@ -33,10 +33,10 @@ async def open_engine(engine_path):
 async def play_handler(engine, board):
   try:
     # 100ms max
-    result = await asyncio.wait_for(engine.play(board, chess.engine.Limit(time=0.01)), 0.1)
+    result = await asyncio.wait_for(engine.play(board, chess.engine.Limit(time=0.01)), 0.5)
     return result
   except asyncio.TimeoutError:
-    print("engine move took longer than 100ms")
+    print("engine move took longer than 500ms")
   except chess.engine.EngineTerminatedError:
     print("engine process died unexpectedly")
   except Exception:
