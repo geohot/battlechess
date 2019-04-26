@@ -9,6 +9,13 @@ import traceback
 from datetime import datetime
 from collections import defaultdict
 
+async def open_engine(engine_path):
+  try:
+    transport, engine = await chess.engine.popen_uci(engine_path, stderr=open('/dev/null'))
+    return engine
+  except Exception:
+    return None
+
 async def play_handler(engine, board):
   try:
     # 100ms max
@@ -28,29 +35,38 @@ async def battle(user1, user2):
   engine1_path = ["./launch.sh", user1]
   engine2_path = ["./launch.sh", user2]
 
-  transport, engine1 = await chess.engine.popen_uci(engine1_path, stderr=open('/dev/null'))
-  transport, engine2 = await chess.engine.popen_uci(engine2_path, stderr=open('/dev/null'))
+  engine1 = await open_engine(engine1_path)
+  engine2 = await open_engine(engine2_path)
 
-  board = chess.Board()
+  # check if engines didn't boot
   outcome = None
-  while not board.is_game_over():
-    #print("***** move %d turn %d *****" % (board.fullmove_number, board.turn))
-    #print(board)
-    if board.turn:
-      # white
-      result = await play_handler(engine1, board)
-      if result is None:
-        print("%s(white) forfeits" % user1)
-        outcome = "0-1"
-        break
-    else:
-      # black
-      result = await play_handler(engine2, board)
-      if result is None:
-        print("%s(black) forfeits" % user2)
-        outcome = "1-0"
-        break
-    board.push(result.move)
+  if engine1 is None and engine2 is None:
+    outcome = "1/2-1/2"
+  elif engine1 is None:
+    outcome = "0-1"
+  elif engine2 is None:
+    outcome = "1-0"
+
+  if outcome is None:
+    board = chess.Board()
+    while not board.is_game_over():
+      #print("***** move %d turn %d *****" % (board.fullmove_number, board.turn))
+      #print(board)
+      if board.turn:
+        # white
+        result = await play_handler(engine1, board)
+        if result is None:
+          print("%s(white) forfeits" % user1)
+          outcome = "0-1"
+          break
+      else:
+        # black
+        result = await play_handler(engine2, board)
+        if result is None:
+          print("%s(black) forfeits" % user2)
+          outcome = "1-0"
+          break
+      board.push(result.move)
 
   await engine1.quit()
   await engine2.quit()
