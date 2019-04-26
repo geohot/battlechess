@@ -14,6 +14,15 @@ if __name__ == "__main__":
     print(board)
 
     # human plays black
-    human_move = chess.Move.from_uci(input("move:"))
+    while 1:
+      try:
+        human_move = chess.Move.from_uci(input("move:"))
+        if human_move in board.legal_moves:
+          break
+        else:
+          print("illegal move")
+      except Exception:
+        print("invalid move")
+        pass
     board.push(human_move)
 
