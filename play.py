@@ -7,6 +7,7 @@ import chess
 import chess.engine
 import requests
 import traceback
+import subprocess
 from datetime import datetime
 from collections import defaultdict
 
@@ -21,7 +22,7 @@ async def open_engine(engine_path):
     if DEBUG:
       transport, engine = await chess.engine.popen_uci(engine_path)
     else:
-      transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=open('/dev/null')), 30.0)
+      transport, engine = await asyncio.wait_for(chess.engine.popen_uci(engine_path, stderr=subprocess.DEVNULL), 30.0)
     return engine
   except asyncio.TimeoutError:
     print("engine startup took longer than 30s")
