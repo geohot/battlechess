@@ -61,10 +61,10 @@ def minimaxEngine(board, depth):
     board.push(move)
     moveBoardValue = minimax(board, depth-1, false, baseAlpha, baseBeta)
     board.pop()
-    if (boardMoveValue >= bestMove) {
+    if boardMoveValue >= bestMove:
       bestMoveBoardValue = moveBoardValue
       bestMove = move
-    }
+    
 
   return bestMove
 
