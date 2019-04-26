@@ -79,8 +79,10 @@ async def battle(user1, user2):
           break
       board.push(result.move)
 
-  await engine1.quit()
-  await engine2.quit()
+  if engine1 is not None:
+    await engine1.quit()
+  if engine2 is not None:
+    await engine2.quit()
   result = outcome if outcome is not None else board.result()
 
   # print outcome of match
