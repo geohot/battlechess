@@ -14,7 +14,7 @@ def get_move(board, limit=None):
   try: 
     color = board.turn
     before = timer()
-    move = minimaxEngine(board, 1, color)
+    move = minimaxEngine(board, 2, color)
     after = timer()
     speed = after - before
     print("Time to generate move:", speed, file=sys.stderr)
@@ -34,7 +34,6 @@ def minimax(board, depth, maximizer, alpha, beta, color):
     speed = after - before
     print("Time to generate board value:", speed, file=sys.stderr)
 
-
     return value
   
   if maximizer:
@@ -45,11 +44,7 @@ def minimax(board, depth, maximizer, alpha, beta, color):
       board.pop()
       alpha = max(alpha, maxMoveBoardValue)
       if beta <= alpha:
-
-        print("Pruned in maximizer:", file=sys.stderr )
-
         return maxMoveBoardValue
-    # print("max", alpha, beta, maxMoveBoardValue, file=sys.stderr)
 
     return maxMoveBoardValue
   else:
@@ -60,10 +55,7 @@ def minimax(board, depth, maximizer, alpha, beta, color):
       board.pop()
       beta = min(beta, minMoveBoardValue)
       if beta <= alpha:
-        print("Pruned in minimizer:", file=sys.stderr )
-
         return minMoveBoardValue
-    # print("min", alpha, beta, minMoveBoardValue, file=sys.stderr)
     return minMoveBoardValue
 
 
