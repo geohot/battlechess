@@ -7,8 +7,9 @@ import chess
 def get_move(board, limit=None):
   # TODO: Fill this in with an actual chess engine
   move = random.choice(list(board.legal_moves))
+  
 
-  #print("playing", move, file=sys.stderr)
+  print("playing", move, file=sys.stderr)
   return move
 
 if __name__ == "__main__":
